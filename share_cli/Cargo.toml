@@ -1,0 +1,14 @@
+[package]
+name = "share_cli"
+version = "0.1.0"
+authors = ["Edouard Menayde <edouard.menayde@gmail.com>"]
+
+[dependencies]
+docopt = "0.8"
+serde = "1.0" # if you're using `derive(Deserialize)`
+serde_derive = "1.0" # if you're using `derive(Deserialize)`
+share_core = { path = "../share_core" }
+clipboard = "0.4.4"
+which = "1.0.5"
+yansi = "0.4.0"
+spinners = "1.0.0"

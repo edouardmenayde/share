@@ -1,0 +1,6 @@
+[package]
+name = "share_gui"
+version = "0.1.0"
+authors = ["Edouard Menayde <edouard.menayde@gmail.com>"]
+
+[dependencies]

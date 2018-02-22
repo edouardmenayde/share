@@ -4,3 +4,8 @@ version = "0.1.0"
 authors = ["Edouard Menayde <edouard.menayde@gmail.com>"]
 
 [dependencies]
+share_cli = { path = "share_cli" }
+share_gui = { path = "share_gui" }
+share_core = { path = "share_core" }
+
+[workspace]

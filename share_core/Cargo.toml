@@ -1,0 +1,9 @@
+[package]
+name = "share_core"
+version = "0.1.0"
+authors = ["Edouard Menayde <edouard.menayde@gmail.com>"]
+
+[dependencies]
+reqwest = "0.8.5"
+serde = "1.0" # if you're using `derive(Deserialize)`
+serde_derive = "1.0" # if you're using `derive(Deserialize)`
