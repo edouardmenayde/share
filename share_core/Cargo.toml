@@ -7,3 +7,4 @@ authors = ["Edouard Menayde <edouard.menayde@gmail.com>"]
 reqwest = "0.8.5"
 serde = "1.0" # if you're using `derive(Deserialize)`
 serde_derive = "1.0" # if you're using `derive(Deserialize)`
+serde_json = "1.0"

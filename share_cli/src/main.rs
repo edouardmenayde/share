@@ -8,11 +8,14 @@ extern crate spinners;
 
 use share_core::provider::Provider;
 use share_core::providers::file_io_provider::FileIOProvider;
+use share_core::providers::imgur_provider::ImgurProvider;
+use share_core::providers::get_provider_instance;
 use yansi::Paint;
 use docopt::Docopt;
 use std::process::exit;
 use std::io;
 use std::io::Write;
+use std::path::Path;
 use spinners::{Spinner, Spinners};
 
 mod clip;
@@ -38,6 +41,7 @@ Options:
 #[derive(Debug, Deserialize)]
 struct Args {
   arg_file: String,
+  arg_provider: Option<String>,
   flag_unix: bool
 }
 
@@ -51,6 +55,12 @@ fn main() {
       .unwrap_or_else(|e| e.exit());
 
   let unix_mode = args.flag_unix;
+  let provider_name = match args.arg_provider {
+    Some(provider) => provider,
+    None => String::from("")
+  };
+
+  let provider = get_provider_instance(provider_name);
 
   let mut sp: Option<Spinner> = None;
 
@@ -58,7 +68,7 @@ fn main() {
     sp = Some(Spinner::new(Spinners::Dots9, "Uploading...".into()));
   }
 
-  let response = FileIOProvider::upload(&args.arg_file);
+  let response = provider.upload(Path::new(&args.arg_file));
 
   match response {
     Ok(response) => {
@@ -66,7 +76,7 @@ fn main() {
         sp.stop();
       }
 
-      clip::Clipboard::copy(&response.link.to_owned());
+      clip::Clipboard::copy(&response.link);
       clear();
 
       if unix_mode {
@@ -78,7 +88,11 @@ fn main() {
             .underline());
       }
     }
-    Err(_) => {
+    Err(err) => {
+      if !unix_mode {
+        println!("{:?}", err);
+      }
+
       exit(1);
     }
   }

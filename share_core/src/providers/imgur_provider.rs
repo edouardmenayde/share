@@ -1,4 +1,5 @@
 use reqwest::{Response, Client, multipart};
+use reqwest::header::Authorization;
 use std::fs::{File, metadata};
 use std::path::Path;
 
@@ -6,17 +7,26 @@ use error::ExecutionError;
 
 use provider::{Provider, ProviderResponse, GIGABYTE};
 
-pub struct FileIOProvider;
+extern crate serde_json;
 
+use serde_json::{Value, Error};
+
+pub struct ImgurProvider;
+
+#[derive(Debug)]
 #[derive(Deserialize)]
-struct ResponseBody {
-  success: bool,
-  pub link: String,
-//  key: String,
-//  expiry: String,
+struct ResponseBodyData {
+  pub link: Option<String>,
 }
 
-impl Provider for FileIOProvider {
+#[derive(Debug)]
+#[derive(Deserialize)]
+struct ResponseBody {
+  pub data: Option<ResponseBodyData>,
+  pub success: bool,
+}
+
+impl Provider for ImgurProvider {
   fn get_max_size(&self) -> u64 {
     5 * GIGABYTE as u64
   }
@@ -32,21 +42,29 @@ impl Provider for FileIOProvider {
     let client = Client::new();
 
     let form = multipart::Form::new()
-        .file("file", filename)?;
+        .file("image", filename)?;
 
     let mut res = client
-        .post("https://file.io")
+        .post("https://api.imgur.com/3/image")
+        .header(Authorization("Client-ID 358919b724940a5".to_owned()))
         .multipart(form)
         .send()?;
 
-    let body: ResponseBody = res.json()?;
+    let data = res.text()?;
+
+    let body: ResponseBody = serde_json::from_str(data.as_str())?; // Can't use .json of res...
 
     if !body.success {
       return Err(ExecutionError::Custom(String::from("File upload failed.")));
     }
 
-    Ok(ProviderResponse {
-      link: body.link
-    })
+    if let Some(data) = body.data {
+      if let Some(link) = data.link {
+        return Ok(ProviderResponse { link });
+      }
+    }
+
+    Err(ExecutionError::Custom(String::from("File upload failed.")))
   }
 }
+

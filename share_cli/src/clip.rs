@@ -5,7 +5,7 @@ pub struct Clipboard;
 
 impl Clipboard {
   #[cfg(any(windows, macos))]
-  pub fn copy(text: String) -> Result<(), ExecutionError> {
+  pub fn copy(text: &String) -> Result<(), ExecutionError> {
     use clipboard::ClipboardProvider;
     use clipboard::ClipboardContext;
 
